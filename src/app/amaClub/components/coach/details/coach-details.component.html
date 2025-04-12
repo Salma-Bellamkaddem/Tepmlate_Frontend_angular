@@ -1,0 +1,29 @@
+<div class="card">
+    <p-tabView orientation="left">
+        <p-tabPanel header="Details" class="line-height-3 m-0">
+            <p-progressBar *ngIf="coach === undefined || coach === null" mode="indeterminate" [style]="{ height: '6px' }"  />
+            <div *ngIf="coach != undefined"> <span class="text-900 font-medium text-4xl mb-4 ">{{coach.firstName}} {{coach.lastName}}</span><span class="text-primary font-medium text-4xl mb-4 "> Informations</span></div>
+            <hr/>
+
+            <br/>
+            <div class="grid formgrid p-fluid" *ngIf="coach != undefined">
+                <div class="field mb-4 col-12 md:col-6">
+                    <label for="coachCode" class="font-bold text-9OO" style="font-size: 18px;">Code: </label><span id="coachCode" style="font-size: 18px;">  {{coach.coachCode}}</span>
+                </div>
+                <div class="field mb-4 col-12 md:col-6">
+                    <label for="cin" class="font-bold text-9OO" style="font-size: 18px;">CIN: </label><span id="cin"  style="font-size: 18px;"> {{coach.cin}}</span>
+                </div>
+                <div class="field mb-4 col-12 md:col-6">
+                    <label for="firstName" class="font-bold text-9OO" style="font-size: 18px;">First Name: </label><span id="firstName" style="font-size: 18px;"> {{coach.firstName}}</span>
+                </div>
+                <div class="field mb-4 col-12 md:col-6">
+                    <label for="lastName" class="font-bold text-9OO" style="font-size: 18px;">Last Name: </label><span id="lastName" style="font-size: 18px;"> {{coach.lastName}}</span>
+                </div>
+                <div class="field mb-4 col-12 md:col-6">
+                    <label for="email" class="font-bold text-9OO" style="font-size: 18px;">Email: </label><span id="email" style="font-size: 18px;"> {{coach.email}}</span>
+                </div>
+            </div>
+        </p-tabPanel>
+
+    </p-tabView>
+</div>
