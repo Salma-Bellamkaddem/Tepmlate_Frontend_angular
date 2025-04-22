@@ -1,0 +1,135 @@
+<div class="h-screen flex w-full surface-ground">
+    <!-- Left Section: Sign-up Form -->
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+   
+
+    <div class="flex flex-1 flex-column surface-ground align-items-center justify-content-center p-4 sm:p-6">
+      <div class="w-11 sm:w-30rem">
+        <div class="flex flex-column justify-content-center items-center">
+          <!-- Icon Section -->
+          <div
+            style="height: 56px; width: 56px"
+            class="bg-primary-50 border-circle flex align-items-center justify-content-center shadow-lg"
+          >
+            <i class="pi pi-users text-primary text-4xl"></i>
+          </div>
+  
+          <!-- Header Section -->
+          <div class="mt-4 text-center">
+            <h1 class="m-0 text-primary font-semibold text-4xl">Join us!</h1>
+            <span class="block text-700 mt-2"
+              >Please fill the fields to sign-up to Ultima network</span
+            >
+          </div>
+        </div>
+  
+        <!-- Sign-Up Form -->
+        <form
+          (ngSubmit)="register()"
+          #registerForm="ngForm"
+          class="flex flex-column gap-4 mt-6 p-4 bg-white rounded-xl shadow-lg"
+        >
+          <!-- Name Input -->
+          <p-inputGroup>
+            <p-inputGroupAddon><i class="pi pi-user"></i></p-inputGroupAddon>
+            <input
+            id="name"
+              type="text"
+              pInputText
+              name="name"
+              placeholder="Name"
+              [(ngModel)]="formData.name"
+              [required]="true"
+              class="p-inputtext-sm w-full"
+            />
+          </p-inputGroup>
+  
+          <!-- Email Input -->
+          <p-inputGroup>
+            <p-inputGroupAddon><i class="pi pi-at"></i></p-inputGroupAddon>
+            <input
+            id="email"
+              type="email"
+              pInputText
+              name="email"
+              placeholder="Email Address"
+              [(ngModel)]="formData.email"
+              required
+              #email="ngModel"
+              class="p-inputtext-sm w-full"
+            />
+          </p-inputGroup>
+          <div *ngIf="email.invalid && email.touched" class="text-red-500 text-sm">
+            Valid &#64;cooperative.com email is required
+          </div>
+  
+          <!-- Password Input -->
+          <p-inputGroup>
+            <p-inputGroupAddon><i class="pi pi-key"></i></p-inputGroupAddon>
+            <p-password
+            id="password"
+              name="password"
+              [(ngModel)]="formData.password"
+              placeholder="Password"
+              styleClass="w-full"
+              [toggleMask]="true"
+              [feedback]="true"
+              required
+            ></p-password>
+          </p-inputGroup>
+  
+          <!-- Role Dropdown -->
+          <div class="p-field">
+            <label for="role" class="block text-sm text-gray-700 font-medium mb-2">Role</label>
+            <p-dropdown
+            id="role"
+              name="role"
+              [options]="roles"
+              [(ngModel)]="formData.role"
+              optionLabel="label"
+              placeholder="Select Role"
+             [required]="true"
+              class="w-full p-inputtext-sm"
+            ></p-dropdown>
+          </div>
+  
+          <!-- City Input -->
+          <p-inputGroup>
+            <p-inputGroupAddon><i class="pi pi-map-marker"></i></p-inputGroupAddon>
+            <input
+              type="text"
+              pInputText
+              name="city"
+              placeholder="City"
+              [(ngModel)]="formData.city"
+              required
+              class="p-inputtext-sm w-full"
+            />
+          </p-inputGroup>
+  
+          <!-- Submit Button -->
+          <div class="mt-4">
+            <button
+              pButton
+              pRipple
+              type="submit"
+              class="w-full p-button-sm bg-blue-600 text-white rounded-lg py-3 text-lg font-semibold"
+              label="SIGN UP"
+            ></button>
+          </div>
+  
+          <!-- Back to Login Button -->
+          <div class="mt-2 text-center">
+            <button
+              pButton
+              pRipple
+              type="button"
+              class="w-full p-button-text text-primary-500 text-lg"
+              label="BACK TO LOGIN"
+              (click)="navigateToLogin()"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

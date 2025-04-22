@@ -1,0 +1,97 @@
+<p-toast key="tst2"></p-toast>
+<p-toast key="tst3"></p-toast>
+<div> <span class="text-900 font-medium text-4xl mb-4 ">List of</span><span class="text-primary font-medium text-4xl mb-4 "> Gestion Utilisateurs </span></div>
+<br>
+<p-progressBar *ngIf=" users === undefined ||  users.length === 0" mode="indeterminate" [style]="{ height: '6px' }"  />
+<div class="card" *ngIf=" users!== undefined">
+    <p-messages [value]="msgs"></p-messages>
+    <p-table #dt [value]=" users" [paginator]="false" [rows]="10" [showCurrentPageReport]="true" responsiveLayout="scroll"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10,25,50]"
+
+    >
+
+        <ng-template pTemplate="caption">
+            <form [formGroup]="searchForm" >
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+
+                    <input pInputText type="text"  placeholder="Search by userName" class="w-full" formControlName="userName" (change)=" searchUserByName()"/>
+                     <i class="pi pi-search"></i>
+                </span>
+                    <div class="flex flex-wrap gap-2 align-items-center justify-content-around">
+                        <button
+                       
+                         pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-plus"  (click)="goToRegister()"label="Add"></button>
+                        <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
+                    </div>
+                </div>
+            </form>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="Id" class="white-space-nowrap" style="width:25%">ID <p-sortIcon field=" id"></p-sortIcon></th>
+                <th pSortableColumn="Name" class="white-space-nowrap" style="width:15%"> Name <p-sortIcon field="Name"></p-sortIcon></th>
+                <th pSortableColumn="Description" class="white-space-nowrap" style="width:25%">Email <p-sortIcon field="Description"></p-sortIcon></th>
+                <th pSortableColumn="City" class="white-space-nowrap" style="width:15%">Ville <p-sortIcon field="City"></p-sortIcon></th>
+                <th pSortableColumn="Role" class="white-space-nowrap" style="width:15%">Role <p-sortIcon field="Role"></p-sortIcon></th>
+                <th  class="white-space-nowrap" style="width:25%"></th>
+                <th  class="white-space-nowrap" style="width:25%"></th>
+                <th  class="white-space-nowrap" style="width:25%"></th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-coach>
+            <tr>
+                <td>#{{coach.id}}</td>
+                <td style="font-weight: bold;">{{coach.name}}</td>
+                <td>{{coach.email}}</td>
+                <td>{{coach.city}}</td>
+                <td>
+                    <span 
+                      [ngClass]="{
+                        'bg-green-600 text-white hover:bg-green-700': coach.role === 'USER',
+                        'bg-red-600 text-white hover:bg-red-700': coach.role === 'ADMIN',
+                        'bg-yellow-500 text-black hover:bg-yellow-600': coach.role === 'COOPERATIVE'
+                      }"
+                      class="px-4 py-2 text-md font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out flex items-center justify-center"
+                    >
+                      <!-- Icône associée à chaque rôle -->
+                      <i *ngIf="coach.role === 'USER'" class="pi pi-user text-white mr-2"></i>
+                      <i *ngIf="coach.role === 'ADMIN'" class="pi pi-shield text-white mr-2"></i>
+                      <i *ngIf="coach.role === 'COOPERATIVE'" class="pi pi-users text-white mr-2"></i>
+                  
+                      {{ coach.role }}
+                    </span>
+                  </td>
+                <td style="text-align: center;">
+                    <button pButton pRipple type="button" icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain" (click)="navigateToDetails(coach.id)"></button></td>
+                <td>
+                <td>
+                    <p-dialog header="Confirmation"  [(visible)]="displayDialog[coach.id]" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}" >
+                        <p  class="line-height-3 m-0">
+                            <i class="pi pi-exclamation-triangle" style="font-size: 25px"></i>   Are you sure You want to delete the grade {{coach.id}}
+                        </p>
+                        <ng-template pTemplate="footer">
+                            <button pButton icon="pi pi-check" (click)="deleteUser(coach.id)" label="Yes" class="p-button-outlined"></button>
+                        </ng-template>
+                    </p-dialog>
+                    <button (click)="displayDialog[coach.id]=true" pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined" ></button>
+                </td>
+                <td>
+                    <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined" (click)=" navigateToDetails(coach.id)"></button>
+                </td>
+
+
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!--    (onPageChange)="onPageChange($event)"-->
+    <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="0"
+        [rows]="10"
+        [totalRecords]="totalElements"
+        [rowsPerPageOptions]="[10, 20, 30]" />
+</div>
