@@ -1,31 +1,53 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import {Coach} from "../../../models/coach";
-import {CoachService} from "../../../service/coach.service";
-
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { AdminService } from 'src/app/CoopStore/service/admin.service';
+import { UserResponse } from 'src/app/CoopStore/models/UserResponse';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-coach-details',
   templateUrl: './coach-details.component.html',
-  styleUrl: './coach-details.component.scss'
+  styleUrls: ['./coach-details.component.scss']  // ✅ attention au "s"
 })
-export class CoachDetailsComponent {
-  coachCode: any;
-  coach !: Coach;
-  totalElements !: number;
+export class CoachDetailsComponent implements OnInit {
+  user: UserResponse | null = null;
+
+  constructor(
+    private route: ActivatedRoute,
+    private adminService: AdminService,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.coachCode= params['code'];
-    });
-      this.loadCoachDetails();
+    const userId = this.route.snapshot.paramMap.get('id');
+    const token = localStorage.getItem('token') || '';
+    
+    console.log('📌 userId récupéré depuis la route :', userId);
 
+    if (userId && token) {
+      this.adminService.getUsersById(userId, token)
+        .then(user => {
+          this.user = user;
+          console.log('📋 Utilisateur reçu :', this.user);
+        })
+        .catch(error => {
+          console.error('❌ Erreur lors de la récupération de l\'utilisateur', error);
+        });
+    }
   }
-  constructor(private route: ActivatedRoute,  private coachService: CoachService, private router: Router, private cdr: ChangeDetectorRef) { }
 
-  loadCoachDetails() {
-      console.log(this.coachCode)
-    this.coachService.getCoachByCode(this.coachCode).subscribe(data => {
-      this.coach= data.coaches[0];
-        console.log(this.coach)
-    });
+  getFullLogoUrl(relativePath?: string): string {
+    if (!relativePath) {
+      return 'assets/default-profile-picture.jpg';
+    }
+  
+    // Supprimer un éventuel slash initial
+    const cleanPath = relativePath.startsWith('/')
+      ? relativePath.substring(1)
+      : relativePath;
+  
+    return `http://localhost:8080/${cleanPath}`;
+  }
+  goBackToTable() {
+    this.router.navigate(['/coaches/list']); // Remplace '/tableau' par ta route réelle vers le tableau
   }
 }

@@ -1,0 +1,155 @@
+.form-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.success {
+  color: #28a745;
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.error {
+  color: #dc3545;
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.loading {
+  color: #ffc107;
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.back-button {
+  background-color: white;
+  color: #00a8f4;
+  border: 2px solid #bfdbfe;
+  border-radius: 15px;
+  width: 64px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #00a8f4;
+    color: white;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.back-button-tailwind {
+  @apply bg-white text-blue-500 border-2 border-blue-200 rounded-2xl 
+         w-16 h-12 m-8 shadow-sm cursor-pointer flex items-center justify-center
+         transition-all duration-300 hover:bg-blue-500 hover:text-white;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #222;
+}
+
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.header h2 {
+  margin: 14px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #fff;
+  border: 2px solid #dbeafe;
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}

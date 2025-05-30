@@ -19,6 +19,7 @@ import {TableModule} from "primeng/table";
 import {DialogModule} from "primeng/dialog";
 import {PaginatorModule} from "primeng/paginator";
 import {ToastModule} from "primeng/toast";
+import { AuthService } from 'src/app/CoopStore/service/auth.service';
 @Component({
   selector: 'app-coach-list',
   standalone: true,
@@ -52,9 +53,10 @@ import {ToastModule} from "primeng/toast";
   styleUrl: './coach-list.component.scss'
 })
 export class CoachListComponent    {
+  
 // Add this property to manage dialog visibility for each coach
 displayDialog: { [key: string]: boolean } = {};
-
+rows = 10;
   users: User[] = [];
   totalElements: number = 0;
   loading = false;
@@ -68,7 +70,9 @@ displayDialog: { [key: string]: boolean } = {};
     private  route: ActivatedRoute,
     private  messageService: MessageService,
     private  fb: FormBuilder,
-     private router: Router
+     private router: Router ,
+  
+  private authService: AuthService 
     
   ) {
     this.users.forEach(user => {
@@ -79,7 +83,8 @@ displayDialog: { [key: string]: boolean } = {};
 
   ngOnInit(): void {
  
- 
+    this.searchForm = this.fb.group({ userName: [''] });
+    this.loadUsersLazy({ first: 0, rows: this.rows });
 
     this.searchForm = this.fb.group({
       userName: ['']
@@ -88,59 +93,81 @@ displayDialog: { [key: string]: boolean } = {};
     this.loadUsers(0, 5); // Charger les utilisateurs initiaux avec pagination
   }
 
-  async loadUsers(page: number, size: number): Promise<void> {
+  loadUsersLazy(event: any) {
     this.loading = true;
+    const page = (event.first / event.rows) + 1;
+    const size = event.rows;
+    const keyword = this.searchForm.get('userName')?.value || '';
+    const token = localStorage.getItem('token') || '';
+
+    this.userService.getAllUsers(token, keyword, page, size)
+      .then(response => {
+        this.users = response.userList;
+        this.totalElements = response.totalElements;
+
+        // Init displayDialog
+        this.users.forEach(user => {
+          this.displayDialog[user.name] = false;
+        });
+
+        this.loading = false;
+      })
+      .catch(error => {
+        this.loading = false;
+        this.showErrorMessage('Erreur lors du chargement des utilisateurs.');
+        console.error(error);
+      });
+  }
+
+
+  noResults = false; // Ajoute cette propriété dans ton component
+
+
+  showErrorMessage(message: string) {
+    this.showError(message);
+    this.showErrorViaToast();
+  }
+
+  async loadUsers(page: number, size: number, keyword: string = ''): Promise<void> {
+    this.loading = true;
+    this.noResults = false; // reset
+    
     try {
-        const token = localStorage.getItem('token') || ''; // Ajoute cette méthode ou récupère ton token comme tu le fais d’habitude
-      const response = await this.userService.getAllUsers(token, '', page, size);
+      const token = localStorage.getItem('token') || '';
+      const response = await this.userService.getAllUsers(token, keyword, page, size);
   
-      if (response?.statusCode === 200 && Array.isArray(response.ourUsersList)) {
-        this.users = response.ourUsersList;
+      if (response?.statusCode === 200 && Array.isArray(response.userList)) {
+        this.users = response.userList;
         this.totalElements = response.totalElements ?? this.users.length;
+        this.noResults = this.users.length === 0;
       } else {
         this.users = [];
         this.totalElements = 0;
+        this.noResults = true;
         this.showError('No users found.');
         this.showErrorViaToast();
       }
     } catch (error: any) {
+      this.users = [];
+      this.totalElements = 0;
+      this.noResults = true;
       this.showError(error?.message || 'An error occurred while fetching users.');
       this.showErrorViaToast();
     } finally {
       this.loading = false;
     }
   }
+  
+  
 
-  
   async searchUserByName(): Promise<void> {
-    const name = this.searchForm.get('userName')?.value?.trim();
+    const keyword = this.searchForm.get('userName')?.value?.trim() || '';
   
-    if (!name) {
-      // Si le champ est vide, on recharge tous les utilisateurs (page 0, taille 5)
-      this.loadUsers(0, 5);
-      return;
-    }
+    // Appel de l'API avec mot-clé
+    await this.loadUsers(0, 5, keyword);
   
-    const token = localStorage.getItem('token') || ''; // Assure-toi que cette méthode existe, ou remplace par localStorage.getItem('token') || ''
-  
-    try {
-      const data = await this.userService.searchUsersByName(name, token); // 'await' doit être utilisé dans une fonction async
-  
-      if (data?.ourUsersList?.length > 0) {
-        this.users = data.ourUsersList;
-        this.totalElements = data.totalElements ?? this.users.length;
-      } else {
-        this.showError('Aucun utilisateur trouvé avec ce nom.');
-        this.users = [];
-        this.totalElements = 0;
-      }
-    } catch (err: any) {
-      console.error('Erreur lors de la recherche :', err);
-      this.showError('Erreur lors de la recherche de l’utilisateur.');
-      this.showErrorViaToast();
-      this.users = [];
-      this.totalElements = 0;
-    }
+    // Vérifie si aucun utilisateur n’est trouvé
+    this.noResults = this.users?.length === 0;
   }
 
    
@@ -149,30 +176,40 @@ displayDialog: { [key: string]: boolean } = {};
   onPageChange(event: any): void {
     const page = event.page;
     const size = event.rows;
-    this.loadUsers(page, size); // Assure-toi que loadUsers(page, size) utilise bien le token
+    const keyword = this.searchForm.get('userName')?.value?.trim() || '';
+    this.loadUsers(page, size, keyword);
   }
 
   navigateToDetails(userId: number): void {
-    this.router.navigate(['users/details'], { queryParams: { id: userId } });
+    this.router.navigate(['coaches/details', userId]);
   }
 
   async deleteUser(userId: number): Promise<void> {
-    const confirmDelete = confirm('Are you sure you want to delete this user?');
-    if (!confirmDelete) return;
-
+    const token = this.authService.getToken();
+        if (!userId || isNaN(userId)) {
+      this.showError('User ID is invalid');
+      this.showErrorViaToast();
+      return;
+    }
+  
+    console.log('🗑️ Tentative de suppression de l’utilisateur avec ID:', userId);
+  
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        this.showError('Authentication token missing.');
-        this.showErrorViaToast();
-        return;
-      }
-
-      await this.userService.deleteUser(userId.toString(), token);
-      this.showSuccessViaToast();
-      this.loadUsers(0, 5); // refresh list
+      await this.userService.deleteUser(userId.toString(), token)
+        .then(response => {
+          console.log('✅ Utilisateur supprimé avec succès :', response);
+          this.showSuccessViaToast();
+          this.users = this.users.filter(user => user.id !== userId);
+        })
+        .catch(error => {
+          console.error('❌ Erreur lors de la suppression (catch interne) :', error);
+          this.showError(error.message || 'User not deleted');
+          this.showErrorViaToast();
+        });
+  
     } catch (error: any) {
-      this.showError(error.message || 'Error deleting user.');
+      console.error('❌ Erreur suppression :', error);
+      this.showError(error?.message || 'User not detected');
       this.showErrorViaToast();
     }
   }
@@ -210,6 +247,13 @@ displayDialog: { [key: string]: boolean } = {};
       this.msgs.push({ severity: 'success', summary: 'Success Message', detail: 'User successfully updated' });
     }
   }
+  goToCreateCooperative(): void {
+    this.router.navigate(['coaches/create-cooperative']);
+  }
+
+updateCooperative(userId: number): void {
+  this.router.navigate(['coaches/update-cooperative', userId]);
+}
 
   goToRegister() {
     this.router.navigate(['auth/register'], {

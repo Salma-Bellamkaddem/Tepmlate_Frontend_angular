@@ -1,3 +1,5 @@
+
+import {  CooperativeProfileLite } from './CooperativeProfileLite';
 export interface User {
     id?: number;
     email: string;
@@ -8,5 +10,6 @@ export interface User {
     isProfileCompleted?: boolean;
   
     // Optionnel uniquement pour les utilisateurs mobile
-    cooperativeProfile?: any; // Tu peux aussi importer le modèle exact si besoin
+  
+  cooperativeProfile?: CooperativeProfileLite; // Tu peux aussi importer le modèle exact si besoin
   }

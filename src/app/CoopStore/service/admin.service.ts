@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { lastValueFrom } from 'rxjs';
+import { UserResponse } from '../models/UserResponse';
+import { ReqRes } from '../models/ReqRes';
 
+ // 🟢 ajuste le chemin si besoin
 @Injectable({
   providedIn: 'root'
 })
@@ -11,10 +14,11 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(token: string): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
+  getHeaders(token: string) {
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
   }
 
 
@@ -32,46 +36,50 @@ export class AdminService {
       throw new Error("Erreur de parsing JSON");
     }
   }
-  async getAllUsers(token: string, nameFilter = '', page = 0, size = 10): Promise<any> {
-    let url = `${this.BASE_URL}/admin/get-all-users?page=${page}&size=${size}`;
-    if (nameFilter) {
-      url += `&nameFilter=${nameFilter}`;
-    }
+
+
+  async getAllUsers(token: string, keyword: string, page: number, size: number): Promise<any> {
+    const params = new HttpParams()
+      .set('page', (page + 1).toString())   // si backend commence à 1
+      .set('size', size.toString())
+      .set('nameFilter', keyword);
   
-    const headers = this.getHeaders(token);
-    const response = await lastValueFrom(this.http.get(url, { headers, responseType: 'text' }));
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
-    console.log("📋 Résultat getAllUsersWithFilter:", response);
-  
-    try {
-      return JSON.parse(response);
-    } catch (error) {
-      console.error("❌ JSON parsing failed (getAllUsersWithFilter)", error);
-      throw new Error("Erreur JSON");
-    }
+    return lastValueFrom(
+      this.http.get<any>(`${this.BASE_URL}/admin/all`, { headers, params })
+    );
   }
 
-  async getUsersById(userId: string, token: string): Promise<any> {
-    const url = `${this.BASE_URL}/admin/get-users/${userId}`;
+
+  
+
+  async getUsersById(userId: string, token: string): Promise<UserResponse> {
+    const url = `${this.BASE_URL}/admin/get-user/${userId}`;
     const headers = this.getHeaders(token);
-    return await lastValueFrom(this.http.get<any>(url, { headers }));
+    try {
+      const response = await lastValueFrom(this.http.get<UserResponse>(url, { headers }));
+      return response;
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement de l’utilisateur :', error);
+      throw error;
+    }
   }
 
   async deleteUser(userId: string, token: string): Promise<any> {
-    const url = `${this.BASE_URL}/admin/delete/${userId}`;
-    const headers = this.getHeaders(token);
+    const url = `${this.BASE_URL}/admin/delete-user/${userId}`;    const headers = this.getHeaders(token);
     return await lastValueFrom(this.http.delete<any>(url, { headers }));
   }
 
   async updateUser(userId: string, userData: any, token: string): Promise<any> {
-    const url = `${this.BASE_URL}/admin/update/${userId}`;
+    const url = `${this.BASE_URL}/admin/update-user/${userId}`;
     const headers = this.getHeaders(token);
     return await lastValueFrom(this.http.put<any>(url, userData, { headers }));
   }
 
-  async createCooperativeByAdmin(userData: any, token: string): Promise<any> {
-    const url = `${this.BASE_URL}/admin/create`;
+  async createCooperativeByAdmin(userData: any, token: string): Promise<ReqRes> {
+    const url = `${this.BASE_URL}/admin/create-cooperative`;
     const headers = this.getHeaders(token);
-    return await lastValueFrom(this.http.post<any>(url, userData, { headers }));
+    return await lastValueFrom(this.http.post<ReqRes>(url, userData, { headers }));
   }
 }

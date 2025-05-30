@@ -4,8 +4,7 @@ import {CoachDetailsComponent} from "./coach-details.component";
 
 @NgModule({
     imports: [RouterModule.forChild([
-        { path: '', component: CoachDetailsComponent }
-    ])],
+      { path: 'details/:id', component: CoachDetailsComponent }    ])],
     exports: [RouterModule]
 })
 export class CoachDetailsRoutingModule { }

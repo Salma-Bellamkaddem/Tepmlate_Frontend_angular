@@ -2,13 +2,26 @@
 <p-toast key="tst3"></p-toast>
 <div> <span class="text-900 font-medium text-4xl mb-4 ">List of</span><span class="text-primary font-medium text-4xl mb-4 "> Gestion Utilisateurs </span></div>
 <br>
+
+<!-- Message "Aucune coopérative trouvée" au-dessus de la table -->
+<p-messages
+  *ngIf="noResults && !loading"
+  [value]="[{ severity: 'warn', summary: 'Alerte', detail: 'Aucune coopérative trouvée avec ce nom.' }]"
+  class="mt-3"
+/>
 <p-progressBar *ngIf=" users === undefined ||  users.length === 0" mode="indeterminate" [style]="{ height: '6px' }"  />
 <div class="card" *ngIf=" users!== undefined">
     <p-messages [value]="msgs"></p-messages>
-    <p-table #dt [value]=" users" [paginator]="false" [rows]="10" [showCurrentPageReport]="true" responsiveLayout="scroll"
-             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10,25,50]"
-
-    >
+    <p-table
+    #dt
+    [value]="users"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    [responsiveLayout]="'scroll'"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} entrées"
+    [rowsPerPageOptions]="[10, 25, 50]"
+  >
 
         <ng-template pTemplate="caption">
             <form [formGroup]="searchForm" >
@@ -21,7 +34,7 @@
                     <div class="flex flex-wrap gap-2 align-items-center justify-content-around">
                         <button
                        
-                         pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-plus"  (click)="goToRegister()"label="Add"></button>
+                         pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-plus"  (click)="  goToCreateCooperative()"label="Add"></button>
                         <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
                     </div>
                 </div>
@@ -34,6 +47,9 @@
                 <th pSortableColumn="Description" class="white-space-nowrap" style="width:25%">Email <p-sortIcon field="Description"></p-sortIcon></th>
                 <th pSortableColumn="City" class="white-space-nowrap" style="width:15%">Ville <p-sortIcon field="City"></p-sortIcon></th>
                 <th pSortableColumn="Role" class="white-space-nowrap" style="width:15%">Role <p-sortIcon field="Role"></p-sortIcon></th>
+                <th pSortableColumn="profileCompleted" class="white-space-nowrap" style="width:10%">
+                  Profil Complété <p-sortIcon field="profileCompleted"></p-sortIcon>
+                </th>
                 <th  class="white-space-nowrap" style="width:25%"></th>
                 <th  class="white-space-nowrap" style="width:25%"></th>
                 <th  class="white-space-nowrap" style="width:25%"></th>
@@ -51,7 +67,7 @@
                       [ngClass]="{
                         'bg-green-600 text-white hover:bg-green-700': coach.role === 'USER',
                         'bg-red-600 text-white hover:bg-red-700': coach.role === 'ADMIN',
-                        'bg-yellow-500 text-black hover:bg-yellow-600': coach.role === 'COOPERATIVE'
+                        'bg-yellow-500 text-black hover:bg-red-700': coach.role === 'COOPERATIVE'
                       }"
                       class="px-4 py-2 text-md font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out flex items-center justify-center"
                     >
@@ -61,6 +77,16 @@
                       <i *ngIf="coach.role === 'COOPERATIVE'" class="pi pi-users text-white mr-2"></i>
                   
                       {{ coach.role }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span 
+                      class="px-2 py-1 rounded font-semibold"
+                      [ngClass]="{
+                        'bg-green-100 text-green-700 border border-green-400': coach.profileCompleted,
+                        'bg-red-100 text-red-700 border border-red-400': !coach.profileCompleted
+                      }">
+                      {{ coach.profileCompleted ? 'Oui' : 'Non' }}
                     </span>
                   </td>
                 <td style="text-align: center;">
@@ -78,7 +104,7 @@
                     <button (click)="displayDialog[coach.id]=true" pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined" ></button>
                 </td>
                 <td>
-                    <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined" (click)=" navigateToDetails(coach.id)"></button>
+                    <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined" (click)="updateCooperative(coach.id)"></button>
                 </td>
 
 
@@ -88,10 +114,5 @@
     </p-table>
 
     <!--    (onPageChange)="onPageChange($event)"-->
-    <p-paginator
-        (onPageChange)="onPageChange($event)"
-        [first]="0"
-        [rows]="10"
-        [totalRecords]="totalElements"
-        [rowsPerPageOptions]="[10, 20, 30]" />
+  
 </div>

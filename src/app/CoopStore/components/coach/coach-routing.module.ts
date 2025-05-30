@@ -1,13 +1,26 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+
+import { RouterModule, Routes } from '@angular/router';
+
+import { CoachListComponent } from './list/coach-list.component';
+import { CoachDetailsComponent } from './details/coach-details.component';
+import { CreateCooperativeComponent } from './create-cooperative/create-cooperative.component';
+import { UpdateCooperativeComponent } from './update-cooperative/update-cooperative.component';
+
+
+const routes: Routes = [
+  { path: 'list', component: CoachListComponent },
+  { path: 'details/:id', component: CoachDetailsComponent },
+  { path: 'create-cooperative', component: CreateCooperativeComponent },
+  { path: 'update-cooperative/:userId', component: UpdateCooperativeComponent },
+  // 👈 ajout de cette route
+
+  { path: '', redirectTo: 'list', pathMatch: 'full' },
+  { path: '**', redirectTo: 'list' }
+];
+
 @NgModule({
-    imports: [RouterModule.forChild([
-        { path: 'list', data: {breadcrumb: 'List'}, loadChildren: () => import('./list/coach-list.module').then(m => m.CoachListModule) },
-        { path: 'create', data: {breadcrumb: 'Create'}, loadChildren: () => import('./create/coach-create.module').then(m => m.CoachCreateModule) },
-        { path: 'update', data: {breadcrumb: 'Update'}, loadChildren: () => import('./update/coach-update.module').then(m => m.CoachUpdateModule) },
-        { path: 'details', data: {breadcrumb: 'Details'}, loadChildren: () => import('./details/coach-details.module').then(m => m.CoachDetailsModule) },
-        { path: '**', redirectTo: '/notfound' }
-    ])],
-    exports: [RouterModule]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
-export class CoachRoutingModule { }
+export class CoachRoutingModule {}

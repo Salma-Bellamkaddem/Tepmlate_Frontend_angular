@@ -18,6 +18,8 @@ import {CoachDetailsRoutingModule} from "./coach-details-routing.module";
 import {TabViewModule} from "primeng/tabview";
 @NgModule({
     imports: [
+      
+        CommonModule,
         CommonModule,
         FormsModule,
         CoachDetailsRoutingModule,

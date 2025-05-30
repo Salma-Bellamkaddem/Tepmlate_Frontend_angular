@@ -109,4 +109,7 @@ async register(userData:any, token:string):Promise<any>{
     const role = localStorage.getItem('role');
     return role === 'COOPERATIVE';
   }
+  getToken(): string {
+    return localStorage.getItem('token') || '';
+  }
 }
