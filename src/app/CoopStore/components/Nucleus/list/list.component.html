@@ -1,0 +1,334 @@
+<div class="grid">
+  <div class="col-12">
+    <!-- Header avec titre et actions -->
+    <div class="flex justify-content-between align-items-center mb-4 flex-wrap">
+      <div>
+        <h1 class="text-900 font-medium text-4xl mb-2">
+          <i class="pi pi-users mr-3 text-primary"></i>
+          Gestion des Nucleus
+        </h1>
+        <p class="text-600 text-lg mt-0 mb-0">
+          Administrer les groupes de coopératives par secteur d'activité
+        </p>
+      </div>
+      
+      <div class="flex gap-2">
+        <p-button 
+          label="Nouveau Nucleus" 
+          icon="pi pi-plus" 
+          (onClick)="openCreateDialog()"
+          class="p-button-primary">
+        </p-button>
+        
+
+
+        <p-button 
+          icon="pi pi-refresh" 
+          (onClick)="refresh()" 
+          pTooltip="Actualiser la liste"
+          class="p-button-outlined">
+        </p-button>
+
+        <p-button 
+          icon="pi pi-download" 
+          (onClick)="exportData()" 
+          pTooltip="Exporter les données"
+          class="p-button-outlined">
+        </p-button>
+      </div>
+    </div>
+<!-- Dans le template -->
+
+    <!-- Section des filtres -->
+    <p-card class="mb-4">
+      <div class="grid">
+        <div class="col-12 md:col-4">
+          <label class="block text-900 font-medium mb-2">Rechercher</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input 
+              type="text" 
+              pInputText 
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange($event)"
+              placeholder="Nom, facilitateur, description..."
+              class="w-full">
+          </span>
+        </div>
+
+        <div class="col-12 md:col-3">
+          <label class="block text-900 font-medium mb-2">Secteur d'activité</label>
+          <p-dropdown 
+            [options]="sectorOptions" 
+            [(ngModel)]="selectedSector"
+            (onChange)="onSectorChange()"
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Tous les secteurs"
+            class="w-full">
+          </p-dropdown>
+        </div>
+
+        <div class="col-12 md:col-3">
+          <label class="block text-900 font-medium mb-2">Statut</label>
+          <p-dropdown 
+            [options]="statusOptions" 
+            [(ngModel)]="selectedStatus"
+            (onChange)="onStatusChange()"
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Tous les statuts"
+            class="w-full">
+          </p-dropdown>
+        </div>
+
+        <div class="col-12 md:col-2 flex align-items-end">
+          <p-button 
+            label="Réinitialiser" 
+            icon="pi pi-times" 
+            (onClick)="clearFilters()"
+            [disabled]="!hasActiveFilters()"
+            class="p-button-secondary w-full">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Indicateur de résultats -->
+    <div class="mb-3" *ngIf="!loading">
+      <p class="text-600 m-0">
+        <strong class="text-900">{{ filteredNucleus.length }}</strong> nucleus trouvé(s)
+        <span *ngIf="filteredNucleus.length !== totalElements" class="ml-2">
+          sur {{ totalElements }} au total
+        </span>
+      </p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-8">
+      <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+      <p class="text-600 mt-3">Chargement des nucleus...</p>
+    </div>
+
+    <!-- Tableau des nucleus -->
+    <p-card *ngIf="!loading">
+      <!-- Message si aucun résultat -->
+      <div *ngIf="filteredNucleus.length === 0" class="text-center py-8">
+        <i class="pi pi-info-circle text-6xl text-400 mb-4"></i>
+        <h3 class="text-900 font-medium text-2xl mb-3">Aucun nucleus trouvé</h3>
+        <p class="text-600 mb-4" *ngIf="hasActiveFilters()">
+          Aucun nucleus ne correspond à vos critères de recherche.
+        </p>
+        <p class="text-600 mb-4" *ngIf="!hasActiveFilters()">
+          Il n'y a pas encore de nucleus créé.
+        </p>
+        
+        <div class="flex gap-2 justify-content-center flex-wrap">
+          <p-button 
+            *ngIf="hasActiveFilters()"
+            label="Réinitialiser les filtres" 
+            icon="pi pi-times" 
+            (onClick)="clearFilters()"
+            class="p-button-outlined">
+          </p-button>
+          
+          <p-button 
+            label="Créer le premier nucleus" 
+            icon="pi pi-plus" 
+            (onClick)="openCreateDialog()"
+            class="p-button-primary">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Tableau -->
+      <p-table 
+        *ngIf="filteredNucleus.length > 0"
+        [value]="filteredNucleus" 
+        [paginator]="true" 
+        [rows]="pageSize"
+        [totalRecords]="totalElements"
+        [rowsPerPageOptions]="pageSizeOptions"
+        [first]="currentPage * pageSize"
+        (onPage)="onPageChange($event)"
+        [responsive]="true"
+        [resizableColumns]="true"
+        [sortMode]="'multiple'"
+        styleClass="p-datatable-gridlines p-datatable-striped">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="id" class="text-center" style="width: 80px">
+              ID <p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="name" style="min-width: 250px">
+              Nucleus <p-sortIcon field="name"></p-sortIcon>
+            </th>
+            <th pSortableColumn="activitySector" class="text-center" style="width: 150px">
+              Secteur <p-sortIcon field="activitySector"></p-sortIcon>
+            </th>
+            <th pSortableColumn="facilitatorName" style="width: 180px">
+              Facilitateur <p-sortIcon field="facilitatorName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="memberCount" class="text-center" style="width: 120px">
+              Membres <p-sortIcon field="memberCount"></p-sortIcon>
+            </th>
+            <th class="text-center" style="width: 150px">
+              Capacité
+            </th>
+            <th pSortableColumn="active" class="text-center" style="width: 120px">
+              Statut <p-sortIcon field="active"></p-sortIcon>
+            </th>
+            <th class="text-center" style="width: 120px">
+              Actions
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-nucleus>
+          <tr [ngClass]="getRowClass(nucleus)">
+            <!-- ID -->
+            <td class="text-center">
+              <p-tag 
+                [value]="'#' + nucleus.id" 
+                severity="secondary"
+                [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- Nom -->
+            <td>
+              <div>
+                <div class="font-medium text-900 mb-1">{{ nucleus.name }}</div>
+                <div class="text-600 text-sm" *ngIf="nucleus.description">
+                  {{ nucleus.description }}
+                </div>
+              </div>
+            </td>
+
+            <!-- Secteur -->
+            <td class="text-center">
+              <p-tag 
+                [value]="formatActivitySector(nucleus.activitySector)"
+                severity="info"
+                [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- Facilitateur -->
+            <td>
+              <div class="flex align-items-center">
+                <i class="pi pi-user text-400 mr-2"></i>
+                <span>{{ nucleus.facilitatorName || 'Non défini' }}</span>
+              </div>
+            </td>
+
+            <!-- Membres -->
+            <td class="text-center">
+              <div class="flex flex-column align-items-center">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-users mr-2" [ngClass]="nucleus.full ? 'text-red-500' : 'text-blue-500'"></i>
+                  <span [ngClass]="nucleus.full ? 'text-red-500 font-medium' : 'text-900'">
+                    {{ nucleus.memberCount }} / {{ nucleus.maxMembers }}
+                  </span>
+                </div>
+                <small class="text-500">
+                  {{ getOccupancyPercentage(nucleus) | number:'1.0-0' }}%
+                </small>
+              </div>
+            </td>
+
+            <!-- Capacité -->
+            <td>
+              <div class="flex flex-column">
+                <div class="flex justify-content-between align-items-center mb-1">
+                  <small class="text-600">{{ nucleus.maxMembers }} places</small>
+                </div>
+                <p-progressBar 
+                  [value]="getOccupancyPercentage(nucleus)"
+                  [style]="{'height': '8px'}"
+                  [color]="nucleus.full ? '#ef4444' : '#3b82f6'">
+                </p-progressBar>
+              </div>
+            </td>
+
+            <!-- Statut -->
+            <td class="text-center">
+              <p-tag 
+                [value]="getStatusText(nucleus)"
+                [severity]="getStatusSeverity(nucleus)"
+                [icon]="getStatusIcon(nucleus)"
+                [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-center">
+              <div class="flex justify-content-center gap-1">
+                <p-button 
+                  icon="pi pi-eye" 
+                  (onClick)="viewNucleusDetails(nucleus.id)"
+                  pTooltip="Voir les détails"
+                  size="small"
+                  class="p-button-rounded p-button-text">
+                </p-button>
+
+                <p-button 
+          icon="pi pi-users" 
+          (onClick)="navigateToMembers(nucleus.id)"
+          pTooltip="Gérer les membres ({{ nucleus.memberCount }}/{{ nucleus.maxMembers }})"
+          size="small"
+          class="p-button-success p-button-text p-button-rounded">
+        </p-button>
+
+                <p-button 
+                  icon="pi pi-ellipsis-v" 
+                  (onClick)="menu.toggle($event)"
+                  pTooltip="Plus d'actions"
+                  size="small"
+                  class="p-button-rounded p-button-text">
+                </p-button>
+
+                <p-menu #menu [popup]="true" [model]="getMenuItems(nucleus)"></p-menu>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center py-4">
+              <p class="text-500">Aucun nucleus trouvé</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+</div>
+
+<!-- Dialog de création/édition -->
+<p-dialog 
+  header="Nouveau Nucleus" 
+  [(visible)]="showCreateDialog" 
+  [modal]="true" 
+  [style]="{width: '600px'}" 
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false">
+  
+  <div class="text-center py-4">
+    <i class="pi pi-info-circle text-blue-500 text-3xl mb-3"></i>
+    <p class="text-600">Cette fonctionnalité sera bientôt disponible.</p>
+    <p class="text-600">Le formulaire de création/édition sera implémenté prochainement.</p>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Fermer" 
+      icon="pi pi-times" 
+      (onClick)="closeCreateDialog()"
+      class="p-button-secondary">
+    </p-button>
+  </ng-template>
+</p-dialog>

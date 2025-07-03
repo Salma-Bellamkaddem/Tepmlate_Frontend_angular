@@ -4,7 +4,7 @@ import { User } from 'src/app/CoopStore/models/user';
 import { MessageService, Message } from 'primeng/api';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {ActivatedRoute, Router} from "@angular/router";
-
+import { TagModule } from 'primeng/tag';
 import { CommonModule } from '@angular/common'; 
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
@@ -25,6 +25,7 @@ import { AuthService } from 'src/app/CoopStore/service/auth.service';
   standalone: true,
   providers: [MessageService],
   imports: [
+    TagModule,
     CommonModule, 
     ButtonModule,
     RippleModule,
@@ -254,7 +255,20 @@ rows = 10;
 updateCooperative(userId: number): void {
   this.router.navigate(['coaches/update-cooperative', userId]);
 }
-
+goToNucleus(): void {
+  console.log('Navigation vers /nucleus/list...');
+  this.router.navigate(['/nucleus/list'])
+    .then(success => {
+      if (success) {
+        console.log('✅ Navigation réussie !');
+      } else {
+        console.log('❌ Navigation échouée');
+      }
+    })
+    .catch(error => {
+      console.error('❌ Erreur:', error);
+    });
+}
   goToRegister() {
     this.router.navigate(['auth/register'], {
       queryParams: { role: 'ADMIN' }

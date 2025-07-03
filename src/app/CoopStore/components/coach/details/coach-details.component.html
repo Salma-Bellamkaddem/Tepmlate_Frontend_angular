@@ -1,94 +1,306 @@
-<!-- Grande carte principale -->
-<div class="max-w-6xl mx-auto mt-1 p-6 rounded-3xl shadow-2xl bg-white border border-gray-200">
+<!-- Container principal moderne -->
+<div class="max-w-7xl mx-auto p-4">
 
-  <!-- 🔙 Bouton retour en haut à gauche -->
-  <div class="mb-1">
-    <button
-      class="back-button"
-      (click)="goBackToTable()"
-      aria-label="Retour au tableau"
-      title="Retour"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- 🧩 Grille des cartes internes -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[17px] md:text-[18px] lg:text-[19px]">
+  <!-- Header avec bouton retour -->
+  <div class="flex align-items-center gap-3 mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-round-lg">
+    <p-button
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [text]="true"
+      [rounded]="true"
+      size="large"
+      pTooltip="Retour à la liste"
+      tooltipPosition="bottom"
+      (onClick)="goBackToTable()">
+    </p-button>
     
-    <!-- 🟦 Carte utilisateur -->
-  <!-- 🟦 Carte utilisateur -->
-  <div
-    class="card rounded-2xl p-6 border border-green-400 bg-white shadow-lg"
-    style="box-shadow: 0 4px 10px rgba(80, 92, 113, 0.3);"
-  >
-    <h2 class="text-3xl font-bold mb-6 text-blue-800 flex items-center gap-2">
-      👤 Profil de l'utilisateur
-    </h2>
-    <p class="text-gray-800 mb-3"><strong>👤 Nom :</strong> {{ user?.name || 'Non renseigné' }}</p>
-    <p class="text-gray-800 mb-3"><strong>📧 Email :</strong> {{ user?.email || 'Non renseigné' }}</p>
-    <p class="text-gray-800 mb-3"><strong>🏙️ Ville :</strong> {{ user?.city || 'Non renseigné' }}</p>
-    <p class="text-gray-800 mb-3"><strong>🎓 Rôle :</strong> {{ user?.role || 'Non renseigné' }}</p>
-    <p class="text-gray-800 mb-3">
-      <strong>✅ Profil complété :</strong>
-      <span [ngClass]="{
-        'text-green-600 font-semibold': user?.profileCompleted,
-        'text-red-600 font-semibold': !user?.profileCompleted
-      }">
-        {{ user?.profileCompleted ? 'Oui' : 'Non' }}
-      </span>
-    </p>
+    <div class="flex-1">
+      <h1 class="text-900 font-bold text-3xl m-0">
+        Détails de l'utilisateur
+      </h1>
+      <p class="text-600 mt-1 mb-0">Informations complètes du profil</p>
+    </div>
+    
+    <div class="hidden md:block">
+      <i class="pi pi-user text-4xl text-blue-300"></i>
+    </div>
   </div>
 
+  <!-- Grille des cartes -->
+  <div class="grid">
+    
+    <!-- Carte Profil Utilisateur -->
+    <div class="col-12 lg:col-6">
+      <div class="card h-full shadow-3 border-round-xl overflow-hidden">
+        
+        <!-- Header de la carte -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
+          <div class="flex align-items-center gap-3">
+            <div class="w-3rem h-3rem border-circle bg-white bg-opacity-20 flex align-items-center justify-content-center">
+              <i class="pi pi-user text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-white font-bold text-xl m-0">Profil Utilisateur</h2>
+              <p class="text-blue-100 text-sm m-0">Informations personnelles</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Corps de la carte -->
+        <div class="p-4">
+          <div class="flex flex-column gap-4">
+            
+            <!-- Nom -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-blue-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-user text-blue-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Nom complet</div>
+                <div class="text-900 font-semibold">{{ user?.name || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Email -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-green-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-envelope text-green-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Adresse email</div>
+                <div class="text-900 font-semibold">{{ user?.email || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Ville -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-orange-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-map-marker text-orange-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Ville</div>
+                <div class="text-900 font-semibold">{{ user?.city || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Rôle -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-purple-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-shield text-purple-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Rôle</div>
+                <span 
+                  [ngClass]="{
+                    'bg-green-100 text-green-700 border border-green-300': user?.role === 'USER',
+                    'bg-red-100 text-red-700 border border-red-300': user?.role === 'ADMIN',
+                    'bg-blue-100 text-blue-700 border border-blue-300': user?.role === 'COOPERATIVE'
+                  }"
+                  class="px-3 py-1 border-round-full text-sm font-semibold inline-flex align-items-center gap-1">
+                  <i *ngIf="user?.role === 'USER'" class="pi pi-user text-xs"></i>
+                  <i *ngIf="user?.role === 'ADMIN'" class="pi pi-shield text-xs"></i>
+                  <i *ngIf="user?.role === 'COOPERATIVE'" class="pi pi-users text-xs"></i>
+                  {{ user?.role || 'Non défini' }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Profil complété -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle flex align-items-center justify-content-center flex-shrink-0"
+                   [ngClass]="{
+                     'bg-green-100': user?.profileCompleted,
+                     'bg-red-100': !user?.profileCompleted
+                   }">
+                <i [ngClass]="{
+                     'pi pi-check text-green-600': user?.profileCompleted,
+                     'pi pi-times text-red-600': !user?.profileCompleted
+                   }"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Statut du profil</div>
+                <span 
+                  [ngClass]="{
+                    'bg-green-100 text-green-700 border border-green-300': user?.profileCompleted,
+                    'bg-red-100 text-red-700 border border-red-300': !user?.profileCompleted
+                  }"
+                  class="px-3 py-1 border-round-full text-sm font-semibold inline-flex align-items-center gap-1">
+                  <i [ngClass]="{
+                       'pi pi-check': user?.profileCompleted,
+                       'pi pi-exclamation-triangle': !user?.profileCompleted
+                     }" class="text-xs"></i>
+                  {{ user?.profileCompleted ? 'Terminé' : 'Incomplet' }}
+                </span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- 🟩 Carte coopérative (affichée seulement si le profil est complété) -->
-<!-- 🟩 Carte coopérative (fond blanc, ombre verte) -->
-<div
-  *ngIf="user?.profileCompleted; else incompleteProfile"
-  class="card rounded-2xl p-6 border border-green-400 bg-white shadow-lg"
-  style="box-shadow: 0 4px 10px rgba(80, 92, 113, 0.3);"  
->
-  <div class="text-center mb-6">
-    <img
-      *ngIf="user?.cooperativeProfile?.logoUrl"
-      [src]="getFullLogoUrl(user?.cooperativeProfile?.logoUrl)"
-      alt="Logo Coopérative"
-      class="mx-auto rounded-lg shadow-md border border-gray-300"
-      style="max-width: 180px;"
-    />
-    <ng-template #noLogo><p>Aucun logo disponible</p></ng-template>
-  </div>
+    <!-- Carte Coopérative -->
+    <div class="col-12 lg:col-6" *ngIf="user?.profileCompleted; else incompleteProfile">
+      <div class="card h-full shadow-3 border-round-xl overflow-hidden">
+        
+        <!-- Header de la carte -->
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4">
+          <div class="flex align-items-center gap-3">
+            <div class="w-3rem h-3rem border-circle bg-white bg-opacity-20 flex align-items-center justify-content-center">
+              <i class="pi pi-building text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-white font-bold text-xl m-0">Coopérative</h2>
+              <p class="text-green-100 text-sm m-0">Informations professionnelles</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Logo de la coopérative -->
+        <div class="p-4 border-bottom-1 surface-border bg-gray-50" *ngIf="user?.cooperativeProfile?.logoUrl">
+          <div class="text-center">
+            <img
+              [src]="getFullLogoUrl(user?.cooperativeProfile?.logoUrl)"
+              alt="Logo Coopérative"
+              class="max-w-full h-6rem object-contain border-round-lg shadow-2 bg-white p-2"
+              style="max-width: 200px;"
+            />
+          </div>
+        </div>
+        
+        <!-- Corps de la carte -->
+        <div class="p-4">
+          <div class="flex flex-column gap-4">
+            
+            <!-- Nom de la coopérative -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-green-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-building text-green-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Nom de la coopérative</div>
+                <div class="text-900 font-semibold">{{ user?.cooperativeProfile?.cooperativeName || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Numéro d'agrément -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-blue-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-id-card text-blue-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Numéro d'agrément</div>
+                <div class="text-900 font-semibold font-mono">{{ user?.cooperativeProfile?.agreementNumber || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Téléphone -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-purple-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-phone text-purple-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Téléphone</div>
+                <div class="text-900 font-semibold">{{ user?.cooperativeProfile?.phone || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Adresse -->
+            <div class="flex align-items-start gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-orange-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-map text-orange-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Adresse</div>
+                <div class="text-900 font-semibold line-height-3">{{ user?.cooperativeProfile?.address || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Produits -->
+            <div class="flex align-items-start gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-teal-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-shopping-bag text-teal-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Produits</div>
+                <div class="text-900 font-semibold line-height-3">{{ user?.cooperativeProfile?.products || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Site web -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-indigo-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-globe text-indigo-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Site web</div>
+                <div class="text-900 font-semibold">
+                  <a
+                    *ngIf="user?.cooperativeProfile?.website; else noWebsite"
+                    [href]="user?.cooperativeProfile?.website"
+                    target="_blank"
+                    class="text-blue-600 hover:text-blue-800 no-underline hover:underline transition-colors transition-duration-200"
+                  >
+                    {{ user?.cooperativeProfile?.website }}
+                    <i class="pi pi-external-link ml-1 text-xs"></i>
+                  </a>
+                  <ng-template #noWebsite>
+                    <span class="text-500">Non renseigné</span>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Région -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-pink-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-map-marker text-pink-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Région</div>
+                <div class="text-900 font-semibold">{{ user?.cooperativeProfile?.region || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+            <!-- Ville de la coopérative -->
+            <div class="flex align-items-center gap-3">
+              <div class="w-2-5rem h-2-5rem border-circle bg-cyan-100 flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-building text-cyan-600"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm text-500 font-medium mb-1">Ville d'implantation</div>
+                <div class="text-900 font-semibold">{{ user?.cooperativeProfile?.city || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <h2 class="text-3xl font-bold mb-6 text-green-800 flex items-center gap-2">
-    🏢 Informations de la coopérative
-  </h2>
-  <p class="text-gray-800 mb-3"><strong>🏷️ Nom :</strong> {{ user?.cooperativeProfile?.cooperativeName || 'Non renseigné' }}</p>
-  <p class="text-gray-800 mb-3"><strong>📄 Numéro d'agrément :</strong> {{ user?.cooperativeProfile?.agreementNumber || 'Non renseigné' }}</p>
-  <p class="text-gray-800 mb-3"><strong>📞 Téléphone :</strong> {{ user?.cooperativeProfile?.phone || 'Non renseigné' }}</p>
-  <p class="text-gray-800 mb-3"><strong>📍 Adresse :</strong> {{ user?.cooperativeProfile?.address || 'Non renseigné' }}</p>
-  <p class="text-gray-800 mb-3"><strong>🛍️ Produits :</strong> {{ user?.cooperativeProfile?.products || 'Non renseigné' }}</p>
-  <p class="text-gray-800 mb-3">
-    <strong>🌐 Site web :</strong>
-    <ng-container *ngIf="user?.cooperativeProfile?.website; else noWebsite">
-      <a
-        [href]="user?.cooperativeProfile?.website"
-        target="_blank"
-        class="text-blue-600 underline font-medium"
-      >
-        {{ user?.cooperativeProfile?.website }}
-      </a>
-    </ng-container>
-    <ng-template #noWebsite><span class="text-gray-500">Non renseigné</span></ng-template>
-  </p>
-  <p class="text-gray-800 mb-3"><strong>🗺️ Région :</strong> {{ user?.cooperativeProfile?.region || 'Non renseigné' }}</p>
-  <p class="text-gray-800"><strong>🏙️ Ville :</strong> {{ user?.cooperativeProfile?.city || 'Non renseigné' }}</p>
-</div>
-
-<ng-template #incompleteProfile>
-  <!-- Affiche rien ou un message si tu veux -->
-</ng-template>
+    <!-- Message pour profil incomplet -->
+    <ng-template #incompleteProfile>
+      <div class="col-12 lg:col-6">
+        <div class="card h-full shadow-3 border-round-xl flex align-items-center justify-content-center text-center p-6">
+          <div>
+            <div class="w-4rem h-4rem border-circle bg-orange-100 flex align-items-center justify-content-center mx-auto mb-3">
+              <i class="pi pi-exclamation-triangle text-orange-600 text-2xl"></i>
+            </div>
+            <h3 class="text-900 font-semibold mb-2">Profil incomplet</h3>
+            <p class="text-600 mb-4 line-height-3">
+              Les informations de la coopérative ne sont pas encore disponibles car le profil n'est pas terminé.
+            </p>
+            <p-button
+              label="Compléter le profil"
+              icon="pi pi-user-edit"
+              severity="warning"
+              [outlined]="true"
+              class="font-medium">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
 
   </div>
 </div>

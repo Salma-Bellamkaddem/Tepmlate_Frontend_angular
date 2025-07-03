@@ -1,0 +1,135 @@
+<div class="p-4">
+  <!-- Header -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h3 class="m-0 text-900 font-bold">
+      <i class="pi pi-users mr-2 text-blue-500"></i>
+      Liste des membres
+      <span class="ml-2 text-sm font-normal text-500">({{ currentMembers.length || 0 }})</span>
+    </h3>
+  </div>
+
+  <!-- Grid de cartes -->
+  <div *ngIf="currentMembers && currentMembers.length > 0; else noMembers" 
+       class="grid">
+    
+    <div *ngFor="let member of currentMembers; trackBy: trackByMemberId"
+         class="col-12 md:col-6 lg:col-4">
+      
+      <div class="card h-full shadow-2 hover:shadow-4 transition-all transition-duration-200 border-round-lg overflow-hidden">
+        
+        <!-- Header de la carte -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-bottom-1 surface-border">
+          <div class="flex justify-content-between align-items-start">
+            <div class="flex-1">
+              <h5 class="m-0 text-900 font-semibold line-height-3 mb-1">
+                {{ member.cooperativeName || 'Nom non défini' }}
+              </h5>
+              <p-tag 
+                [value]="member.active ? 'Actif' : 'Inactif'"
+                [severity]="member.active ? 'success' : 'danger'"
+                [rounded]="true"
+                class="text-xs font-medium">
+              </p-tag>
+            </div>
+            
+            <p-button
+              icon="pi pi-trash"
+              (onClick)="removeMember(member)"
+              pTooltip="Retirer ce membre"
+              tooltipPosition="left"
+              [loading]="removingMemberId === member.id"
+              size="small"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              class="ml-2">
+            </p-button>
+          </div>
+        </div>
+        
+        <!-- Corps de la carte -->
+        <div class="p-3">
+          <div class="flex flex-column gap-3">
+            
+            <!-- Secteur d'activité -->
+            <div class="flex align-items-center gap-2" *ngIf="member.activitySector">
+              <div class="w-2rem h-2rem border-circle bg-green-100 flex align-items-center justify-content-center">
+                <i class="pi pi-tag text-green-600 text-sm"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-500 font-medium mb-1">Secteur</div>
+                <div class="text-sm text-900 font-medium">
+                  {{ formatActivitySector(member.activitySector) }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Nombre de membres -->
+            <div class="flex align-items-center gap-2">
+              <div class="w-2rem h-2rem border-circle bg-blue-100 flex align-items-center justify-content-center">
+                <i class="pi pi-users text-blue-600 text-sm"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-500 font-medium mb-1">Membres</div>
+                <div class="text-sm text-900 font-medium">
+                  {{ member.memberCount || 0 }} {{ (member.memberCount || 0) > 1 ? 'membres' : 'membre' }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Localisation -->
+            <div class="flex align-items-center gap-2" *ngIf="member.city">
+              <div class="w-2rem h-2rem border-circle bg-orange-100 flex align-items-center justify-content-center">
+                <i class="pi pi-map-marker text-orange-600 text-sm"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-500 font-medium mb-1">Localisation</div>
+                <div class="text-sm text-900 font-medium">{{ member.city }}</div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Footer optionnel -->
+        <div class="bg-gray-50 p-3 mt-auto border-top-1 surface-border">
+          <div class="flex align-items-center justify-content-between">
+            <small class="text-500">
+              <i class="pi pi-clock mr-1"></i>
+              Ajouté récemment
+            </small>
+            <div class="flex align-items-center gap-1">
+              <div class="w-0-5rem h-0-5rem border-circle" 
+                   [class]="member.active ? 'bg-green-400' : 'bg-red-400'"></div>
+              <small class="text-600 font-medium">
+                {{ member.active ? 'En ligne' : 'Hors ligne' }}
+              </small>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- État vide avec design amélioré -->
+  <ng-template #noMembers>
+    <div class="text-center py-8">
+      <div class="inline-flex align-items-center justify-content-center w-6rem h-6rem border-circle bg-blue-50 mb-4">
+        <i class="pi pi-users text-4xl text-blue-400"></i>
+      </div>
+      <h4 class="text-900 font-semibold mb-2">Aucun membre trouvé</h4>
+      <p class="text-600 mb-4 line-height-3">
+        Commencez par ajouter des membres à votre coopérative.<br>
+        Ils apparaîtront ici sous forme de cartes.
+      </p>
+      <p-button 
+        label="Inviter des membres" 
+        icon="pi pi-plus"
+        severity="info"
+        [outlined]="true"
+        class="mt-2">
+      </p-button>
+    </div>
+  </ng-template>
+</div>

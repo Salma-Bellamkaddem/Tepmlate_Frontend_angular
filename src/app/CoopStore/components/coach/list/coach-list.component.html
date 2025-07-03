@@ -1,118 +1,316 @@
 <p-toast key="tst2"></p-toast>
 <p-toast key="tst3"></p-toast>
-<div> <span class="text-900 font-medium text-4xl mb-4 ">List of</span><span class="text-primary font-medium text-4xl mb-4 "> Gestion Utilisateurs </span></div>
-<br>
 
-<!-- Message "Aucune coopérative trouvée" au-dessus de la table -->
+<!-- Header moderne -->
+<div class="flex align-items-center justify-content-between mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-round-lg">
+  <div>
+    <h2 class="text-900 font-bold text-3xl m-0">
+      Gestion <span class="text-primary">Utilisateurs</span>
+    </h2>
+    <p class="text-600 mt-1 mb-0">Gérez et administrez vos utilisateurs</p>
+  </div>
+  <div class="hidden md:block">
+    <i class="pi pi-users text-4xl text-blue-300"></i>
+  </div>
+</div>
+
+<!-- Messages d'alerte -->
 <p-messages
   *ngIf="noResults && !loading"
-  [value]="[{ severity: 'warn', summary: 'Alerte', detail: 'Aucune coopérative trouvée avec ce nom.' }]"
-  class="mt-3"
+  [value]="[{ severity: 'warn', summary: 'Aucun résultat', detail: 'Aucun utilisateur trouvé avec ce nom.' }]"
+  class="mb-4"
 />
-<p-progressBar *ngIf=" users === undefined ||  users.length === 0" mode="indeterminate" [style]="{ height: '6px' }"  />
-<div class="card" *ngIf=" users!== undefined">
-    <p-messages [value]="msgs"></p-messages>
-    <p-table
+
+<!-- Loading bar -->
+<div *ngIf="users === undefined || users.length === 0" class="mb-4">
+  <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" class="border-round-full"/>
+</div>
+
+<!-- Contenu principal -->
+<div class="card shadow-3 border-round-xl" *ngIf="users !== undefined">
+  <p-messages [value]="msgs" class="mb-4"></p-messages>
+  
+  <p-table
     #dt
     [value]="users"
     [paginator]="true"
     [rows]="10"
     [showCurrentPageReport]="true"
     [responsiveLayout]="'scroll'"
-    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} entrées"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} utilisateurs"
     [rowsPerPageOptions]="[10, 25, 50]"
-  >
+    styleClass="p-datatable-gridlines p-datatable-striped">
 
-        <ng-template pTemplate="caption">
-            <form [formGroup]="searchForm" >
-                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+    <!-- Header avec recherche et actions -->
+    <ng-template pTemplate="caption">
+      <form [formGroup]="searchForm">
+        <div class="flex flex-wrap gap-3 align-items-center justify-content-between p-3 bg-gray-50 border-round-lg">
+          
+          <!-- Barre de recherche -->
+          <div class="flex-1 min-w-0">
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search text-gray-400"></i>
+              <input 
+                pInputText 
+                type="text" 
+                placeholder="Rechercher par nom d'utilisateur..." 
+                class="w-full border-round-lg" 
+                formControlName="userName" 
+                (input)="searchUserByName()"/>
+            </span>
+          </div>
+          
+          <!-- Boutons d'action -->
+          <div class="flex gap-2 flex-shrink-0">
+            <p-button
+              label="Ajouter"
+              icon="pi pi-plus"
+              severity="success"
+              (onClick)="goToCreateCooperative()"
+              class="font-medium">
+            </p-button>
+            
+            <p-button
+              label="Exporter"
+              icon="pi pi-download"
+              severity="info"
+              [outlined]="true"
+              (onClick)="dt.exportCSV()"
+              class="font-medium">
+            </p-button>
+          </div>
+        </div>
+      </form>
+    </ng-template>
 
-                    <input pInputText type="text"  placeholder="Search by userName" class="w-full" formControlName="userName" (change)=" searchUserByName()"/>
-                     <i class="pi pi-search"></i>
-                </span>
-                    <div class="flex flex-wrap gap-2 align-items-center justify-content-around">
-                        <button
-                       
-                         pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-plus"  (click)="  goToCreateCooperative()"label="Add"></button>
-                        <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
-                    </div>
-                </div>
-            </form>
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th pSortableColumn="Id" class="white-space-nowrap" style="width:25%">ID <p-sortIcon field=" id"></p-sortIcon></th>
-                <th pSortableColumn="Name" class="white-space-nowrap" style="width:15%"> Name <p-sortIcon field="Name"></p-sortIcon></th>
-                <th pSortableColumn="Description" class="white-space-nowrap" style="width:25%">Email <p-sortIcon field="Description"></p-sortIcon></th>
-                <th pSortableColumn="City" class="white-space-nowrap" style="width:15%">Ville <p-sortIcon field="City"></p-sortIcon></th>
-                <th pSortableColumn="Role" class="white-space-nowrap" style="width:15%">Role <p-sortIcon field="Role"></p-sortIcon></th>
-                <th pSortableColumn="profileCompleted" class="white-space-nowrap" style="width:10%">
-                  Profil Complété <p-sortIcon field="profileCompleted"></p-sortIcon>
-                </th>
-                <th  class="white-space-nowrap" style="width:25%"></th>
-                <th  class="white-space-nowrap" style="width:25%"></th>
-                <th  class="white-space-nowrap" style="width:25%"></th>
+    <!-- En-têtes du tableau -->
+    <ng-template pTemplate="header">
+      <tr class="bg-blue-50">
+        <th pSortableColumn="id" class="white-space-nowrap font-semibold text-blue-900" style="width:8%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-hashtag text-sm"></i>
+            ID
+            <p-sortIcon field="id"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th pSortableColumn="name" class="white-space-nowrap font-semibold text-blue-900" style="width:18%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-user text-sm"></i>
+            Nom
+            <p-sortIcon field="name"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th pSortableColumn="email" class="white-space-nowrap font-semibold text-blue-900" style="width:20%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-envelope text-sm"></i>
+            Email
+            <p-sortIcon field="email"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th pSortableColumn="city" class="white-space-nowrap font-semibold text-blue-900" style="width:15%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-map-marker text-sm"></i>
+            Ville
+            <p-sortIcon field="city"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th pSortableColumn="role" class="white-space-nowrap font-semibold text-blue-900" style="width:12%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-shield text-sm"></i>
+            Rôle
+            <p-sortIcon field="role"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th pSortableColumn="profileCompleted" class="white-space-nowrap font-semibold text-blue-900" style="width:12%">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-check-circle text-sm"></i>
+            Profil
+            <p-sortIcon field="profileCompleted"></p-sortIcon>
+          </div>
+        </th>
+        
+        <th class="white-space-nowrap font-semibold text-blue-900 text-center" style="width:15%">
+          <i class="pi pi-cog text-sm mr-1"></i>
+          Actions
+        </th>
+      </tr>
+    </ng-template>
 
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-coach>
-            <tr>
-                <td>#{{coach.id}}</td>
-                <td style="font-weight: bold;">{{coach.name}}</td>
-                <td>{{coach.email}}</td>
-                <td>{{coach.city}}</td>
-                <td>
-                    <span 
-                      [ngClass]="{
-                        'bg-green-600 text-white hover:bg-green-700': coach.role === 'USER',
-                        'bg-red-600 text-white hover:bg-red-700': coach.role === 'ADMIN',
-                        'bg-yellow-500 text-black hover:bg-red-700': coach.role === 'COOPERATIVE'
-                      }"
-                      class="px-4 py-2 text-md font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out flex items-center justify-center"
-                    >
-                      <!-- Icône associée à chaque rôle -->
-                      <i *ngIf="coach.role === 'USER'" class="pi pi-user text-white mr-2"></i>
-                      <i *ngIf="coach.role === 'ADMIN'" class="pi pi-shield text-white mr-2"></i>
-                      <i *ngIf="coach.role === 'COOPERATIVE'" class="pi pi-users text-white mr-2"></i>
-                  
-                      {{ coach.role }}
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    <span 
-                      class="px-2 py-1 rounded font-semibold"
-                      [ngClass]="{
-                        'bg-green-100 text-green-700 border border-green-400': coach.profileCompleted,
-                        'bg-red-100 text-red-700 border border-red-400': !coach.profileCompleted
-                      }">
-                      {{ coach.profileCompleted ? 'Oui' : 'Non' }}
-                    </span>
-                  </td>
-                <td style="text-align: center;">
-                    <button pButton pRipple type="button" icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain" (click)="navigateToDetails(coach.id)"></button></td>
-                <td>
-                <td>
-                    <p-dialog header="Confirmation"  [(visible)]="displayDialog[coach.id]" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}" >
-                        <p  class="line-height-3 m-0">
-                            <i class="pi pi-exclamation-triangle" style="font-size: 25px"></i>   Are you sure You want to delete the grade {{coach.id}}
-                        </p>
-                        <ng-template pTemplate="footer">
-                            <button pButton icon="pi pi-check" (click)="deleteUser(coach.id)" label="Yes" class="p-button-outlined"></button>
-                        </ng-template>
-                    </p-dialog>
-                    <button (click)="displayDialog[coach.id]=true" pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined" ></button>
-                </td>
-                <td>
-                    <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined" (click)="updateCooperative(coach.id)"></button>
-                </td>
+    <!-- Corps du tableau -->
+    <ng-template pTemplate="body" let-user let-rowIndex="rowIndex">
+      <tr class="hover:bg-blue-50 transition-colors transition-duration-200">
+        
+        <!-- ID -->
+        <td class="font-medium text-700">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 border-round text-sm font-mono">
+            #{{user.id}}
+          </span>
+        </td>
+        
+        <!-- Nom -->
+        <td>
+          <div class="flex align-items-center gap-2">
+            <div class="w-2rem h-2rem border-circle bg-blue-100 flex align-items-center justify-content-center">
+              <i class="pi pi-user text-blue-600 text-sm"></i>
+            </div>
+            <span class="font-semibold text-900">{{user.name}}</span>
+          </div>
+        </td>
+        
+        <!-- Email -->
+        <td class="text-600">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-envelope text-gray-400 text-sm"></i>
+            {{user.email}}
+          </div>
+        </td>
+        
+        <!-- Ville -->
+        <td class="text-600">
+          <div class="flex align-items-center gap-2" *ngIf="user.city">
+            <i class="pi pi-map-marker text-orange-500 text-sm"></i>
+            {{user.city}}
+          </div>
+          <span *ngIf="!user.city" class="text-400 font-italic">Non définie</span>
+        </td>
+        
+        <!-- Rôle -->
+      <!-- Rôle -->
+      <td>
+        <span 
+          [ngClass]="{
+            'bg-green-100 text-green-700 border border-green-300': user.role === 'USER',
+            'bg-red-100 text-red-700 border border-red-300': user.role === 'ADMIN',
+            'bg-blue-100 text-blue-700 border border-blue-300': user.role === 'COOPERATIVE'
+          }"
+          class="px-3 py-1 border-round-full text-sm font-semibold flex align-items-center gap-1 inline-flex">
+          <i *ngIf="user.role === 'USER'" class="pi pi-user text-xs"></i>
+          <i *ngIf="user.role === 'ADMIN'" class="pi pi-shield text-xs"></i>
+          <i *ngIf="user.role === 'COOPERATIVE'" class="pi pi-users text-xs"></i>
+          {{user.role}}
+        </span>
+      </td>
+        
+        <!-- Profil complété -->
+        <td class="text-center">
+          <p-tag
+            [value]="user.profileCompleted ? 'Terminé' : 'Incomplet'"
+            [severity]="user.profileCompleted ? 'success' : 'warning'"
+            [rounded]="true"
+            class="font-medium">
+            <ng-template pTemplate="value">
+              <div class="flex align-items-center gap-1">
+                <i [class]="user.profileCompleted ? 'pi pi-check' : 'pi pi-exclamation-triangle'" class="text-xs"></i>
+                {{user.profileCompleted ? 'Oui' : 'Non'}}
+              </div>
+            </ng-template>
+          </p-tag>
+        </td>
+        
+        <!-- Actions -->
+        <td>
+          <div class="flex align-items-center justify-content-center gap-1">
+            
+            <!-- Voir détails -->
+            <p-button
+              icon="pi pi-eye"
+              severity="info"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Voir les détails"
+              tooltipPosition="top"
+              (onClick)="navigateToDetails(user.id)">
+            </p-button>
+            
+            <!-- Modifier -->
+            <p-button
+              icon="pi pi-pencil"
+              severity="success"
+              [outlined]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Modifier"
+              tooltipPosition="top"
+              (onClick)="updateCooperative(user.id)">
+            </p-button>
+            
+            <!-- Supprimer -->
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [outlined]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Supprimer"
+              tooltipPosition="top"
+              (onClick)="displayDialog[user.id] = true">
+            </p-button>
+          </div>
 
+          <!-- Dialog de confirmation -->
+          <p-dialog 
+            header="Confirmation de suppression"
+            [(visible)]="displayDialog[user.id]"
+            [modal]="true"
+            [style]="{width: '450px'}"
+            [breakpoints]="{'960px': '75vw', '641px': '90vw'}"
+            styleClass="border-round-lg">
+            
+            <div class="flex align-items-center gap-3 mb-4">
+              <div class="w-3rem h-3rem border-circle bg-red-100 flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle text-red-600 text-xl"></i>
+              </div>
+              <div>
+                <h5 class="m-0 text-900 font-semibold mb-1">Êtes-vous sûr ?</h5>
+                <p class="text-600 m-0 line-height-3">
+                  Cette action supprimera définitivement l'utilisateur <strong>{{user.name}}</strong> (ID: #{{user.id}}).
+                </p>
+              </div>
+            </div>
+            
+            <ng-template pTemplate="footer">
+              <div class="flex gap-2 justify-content-end">
+                <p-button
+                  label="Annuler"
+                  icon="pi pi-times"
+                  [text]="true"
+                  severity="secondary"
+                  (onClick)="displayDialog[user.id] = false">
+                </p-button>
+                <p-button
+                  label="Supprimer"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  (onClick)="deleteUser(user.id)">
+                </p-button>
+              </div>
+            </ng-template>
+          </p-dialog>
+        </td>
+      </tr>
+    </ng-template>
 
-
-            </tr>
-        </ng-template>
-    </p-table>
-
-    <!--    (onPageChange)="onPageChange($event)"-->
-  
+    <!-- État vide -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center py-6">
+          <div class="flex flex-column align-items-center gap-3">
+            <div class="w-4rem h-4rem border-circle bg-gray-100 flex align-items-center justify-content-center">
+              <i class="pi pi-users text-gray-400 text-2xl"></i>
+            </div>
+            <div>
+              <h5 class="text-900 font-semibold mb-1">Aucun utilisateur</h5>
+              <p class="text-600 m-0">Commencez par ajouter des utilisateurs à votre système.</p>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>

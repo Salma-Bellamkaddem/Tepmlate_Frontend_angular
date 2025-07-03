@@ -12,7 +12,7 @@ import { AdminService } from 'src/app/CoopStore/service/admin.service';
   imports: [CommonModule, ReactiveFormsModule],
 })
 export class UpdateCooperativeComponent implements OnInit {
-
+  isSubmitting: boolean = false;
   updateForm!: FormGroup;
   userId!: string;
   token = localStorage.getItem('token') || '';

@@ -1,0 +1,6 @@
+<p>
+  <app-nucleus-create 
+  *ngIf="showCreateDialog"
+  (nucleusCreated)="onNucleusCreated($event)"
+  (dialogClosed)="onCreateDialogClosed()">
+</app-nucleus-create>
